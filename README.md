@@ -7,6 +7,7 @@ Helping clean up your dependency tree forest.
 - [X] Parse SBT output and construct the dependency tree
 - [X] Find clashes
 - [X] Trace dependencies to particular projects
+- [X] Basic REST API
 - [ ] Basic UI
 - [ ] Add target rules
 - [ ] Find dependencies satisfying and not satisfying the target rules

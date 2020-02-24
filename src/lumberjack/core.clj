@@ -15,10 +15,6 @@
 (timbre/merge-config!
   {:appenders {:spit (appenders/spit-appender {:fname "lumberjack.log"})}})
 
-(defn add-one
-  ([x] 
-   (+ x 1)))
-
 (defn- load-project-dependencies [path]
   (->> (io/file path)
        (slurp)
@@ -30,17 +26,24 @@
 
 (def projects (load-projects config))
 
-;; (def v (first (vals projects)))
+;; Public
 
+(defn project-names
+  "Return a list of the project names."
+  []
+  (keys projects))
 
-;; (def grouped (group-by (fn [{:keys [org pkg ver]}] [org pkg]) (keys v)))
+(defn dependencies
+  "Return a list of the dependencies."
+  []
+  (->> projects
+       (vals)
+       (map keys)
+       (flatten)))
 
-
-;; (clojure.pprint/pprint (into {} (filter (fn [[k vs]] (> (count vs) 1)) grouped)))
-
-
-
-;; (analysis/dependency-clashes projects)
-
-;; (clojure.pprint/pprint (analysis/artifact-to-version-map projects))
+;; TODO: Return types need some thought
+(defn clashes
+  "Return a list of the dependency clashes."
+  []
+  (list (analysis/dependency-clashes projects)))
 

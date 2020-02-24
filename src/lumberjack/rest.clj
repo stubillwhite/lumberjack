@@ -1,6 +1,7 @@
 (ns lumberjack.rest
   (:require [compojure.core :refer [context defroutes DELETE GET POST PUT]]
             [compojure.route :as route]
+            [lumberjack.core :as core]
             [lumberjack.utils :refer [def-]]
             [mount.core :refer [defstate]]
             [ring.adapter.jetty :refer [run-jetty]]
@@ -21,26 +22,29 @@
     (-> response
       (content-type "application/json"))))
 
-(defn- find-person [params]
-  (println "WHITE IMPLEMENT ME"))
-
 (defroutes app-routes
-  (context "/person" []
-           (GET  "/"  {params :params} (find-person params)))
+  (context "/projects" []
+           (GET  "/" {params :params} (core/project-names)))
+
+  (context "/dependencies" []
+           (GET  "/" {params :params} (core/dependencies)))
+
+  (context "/clashes" []
+           (GET  "/" {params :params} (core/clashes)))
   
   (GET "/" [] (redirect "/index.html"))
   (route/resources "/")
   (route/not-found (not-found "Not found")))
 
 (def default-config
-  { :params { :urlencoded true
-              :keywordize true
-              :nested     true
-              :multipart  true }
+  {:params {:urlencoded true
+            :keywordize true
+            :nested     true
+            :multipart  true}
 
-    :responses { :not-modified-responses true
-                 :absolute-redirects     true
-                 :content-types          true } })
+   :responses {:not-modified-responses true
+               :absolute-redirects     true
+               :content-types          true}})
 
 (defn- wrap-log-request [handler]
   (fn [req]
