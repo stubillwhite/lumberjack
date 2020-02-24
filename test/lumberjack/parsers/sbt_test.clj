@@ -17,8 +17,7 @@
        (string/join "\n")))
 
 (defn- dep [org pkg ver]
-  {:org org :pkg pkg :ver ver}
-  {:org org})
+  {:org org :pkg pkg :ver ver})
 
 (deftest parse-dependency-tree-given-empty-tree-then-extracts
   (is (= {(dep "org" "pkg" "ver") #{}} (parse-dependency-tree (mktree ["org:pkg:ver"])))))
@@ -66,12 +65,18 @@
 
 (clojure.pprint/pprint
  (let [tree (mktree ["org:pkg:ver"
-                     "  +-a-org:a-pkg:a-ver"
-                     "  +-b-org:b-pkg:b-ver"
-                     "  | +-c-org:c-pkg:c-ver"])
+                     "  +-a:a:a"
+                     "  +-b:b:b"
+                     "    +-c:c:c"])
        root (dep "org" "pkg" "ver")
-       a    (dep "a-org" "a-pkg" "a-ver")
-       b    (dep "b-org" "b-pkg" "b-ver")
-       c    (dep "c-org" "c-pkg" "c-ver")]
+       a    (dep "a" "a" "a")
+       b    (dep "b" "b" "b")
+       c    (dep "c" "c" "c")]
    (parse-dependency-tree tree)))
+
+
+
+
+
+
 
