@@ -4,8 +4,8 @@ Helping clean up your dependency tree forest.
 
 ## Stuff to do ##
 
-- [ ] Parse SBT output and construct the dependency tree
-- [ ] Find clashes
+- [X] Parse SBT output and construct the dependency tree
+- [X] Find clashes
 - [ ] Trace dependencies to particular projects
 - [ ] Basic UI
 - [ ] Add target rules
@@ -16,4 +16,5 @@ Helping clean up your dependency tree forest.
 
 - [ ] Integrate with SBT and pull the dependency information out rather than parsing it
 - [ ] Handle semantic versioning
+- [ ] Handle Scala versioning
 - [ ] Query repositories to find when dependencies are outdated

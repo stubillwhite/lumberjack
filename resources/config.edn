@@ -2,4 +2,6 @@
          :port 7878}
 
  :projects ["/Users/white1/Dev/recommenders/recs-aws/build-dependencies.txt"
-            "/Users/white1/Dev/recommenders/recs-aws-test/build-dependencies.txt"]}
+            "/Users/white1/Dev/recommenders/recs-aws-test/build-dependencies.txt"
+            "/Users/white1/Dev/recommenders/recs-spark-test/build.sbt"
+            "/Users/white1/Dev/recommenders/recs-validation/build.sbt"]}

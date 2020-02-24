@@ -6,7 +6,7 @@
 
 (defn parse-sbt-dependency [s]
   (let [level           (/ (or (string/index-of s "+") 0) 2)
-        [_ org pkg ver] (re-find #"^[-\|+ ]*([^:]+):([^:]+):([^:]+)" s)]
+        [_ org pkg ver] (re-find #"^[-\|+ ]*([^:]+):([^:]+):([^ ]+)" s)]
     {:org org :pkg pkg :ver ver :level level}))
 
 (defn- build-dependency-tree [deps]
@@ -40,5 +40,3 @@
        (filter (fn [dep] (not (nil? (:org dep)))))
        (build-dependency-tree)
        (clean-dependencies)))
-
-

@@ -9,7 +9,9 @@ COLOR_CLEAR_LINE=\r\033[K
 
 PROJECTS=\
 	$(HOME)/Dev/recommenders/recs-aws/build.sbt \
-	$(HOME)/Dev/recommenders/recs-aws-test/build.sbt 
+	$(HOME)/Dev/recommenders/recs-aws-test/build.sbt \
+	$(HOME)/Dev/recommenders/recs-spark-test/build.sbt \
+	$(HOME)/Dev/recommenders/recs-validation/build.sbt
 
 DEPS=$(PROJECTS:build.sbt=build-dependencies.txt)
 
