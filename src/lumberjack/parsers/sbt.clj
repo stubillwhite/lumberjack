@@ -42,6 +42,3 @@
        (clean-dependencies)))
 
 
-(def example
-  (string/trim (slurp (io/resource "example-data.txt"))))
-
