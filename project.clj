@@ -13,7 +13,7 @@
 
   :main lumberjack.app
   
-  :dependencies [[org.clojure/tools.nrepl "0.2.13"]
+  :dependencies [[nrepl "0.3.1"]
                  [org.clojure/clojure "1.9.0"]
                  [com.taoensso/timbre "4.10.0"]
                  [org.clojure/tools.trace "0.7.10"]

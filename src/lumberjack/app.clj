@@ -1,6 +1,6 @@
 (ns lumberjack.app
   (:gen-class)
-  (:require [clojure.tools.nrepl.server :refer [start-server stop-server]]
+  (:require [nrepl.server :refer [start-server stop-server]]
             [mount.core :as mount :refer [defstate]]
             [lumberjack.config :refer [config]]))
 
