@@ -2,8 +2,7 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as string]))
 
-;; (def text
-;;   (string/trim (slurp (io/resource "example-data.txt"))))
+;; Internal
 
 (defn parse-sbt-dependency [s]
   (let [level           (/ (or (string/index-of s "+") 0) 2)
@@ -30,10 +29,19 @@
   (into {} (for [[k vs] tree] [(dissoc k :level)
                                (into #{} (map (fn [x] (dissoc x :level)) vs))])))
 
-(defn parse-dependency-tree [txt]
+;; Public
+
+(defn parse-dependency-tree
+  "Parse the dependency tree into a graph."
+  [txt]
   (->> (string/split txt #"\n")
        (map (fn [s] (string/replace-first s #"\[info\] " "")))
        (map parse-sbt-dependency)
        (filter (fn [dep] (not (nil? (:org dep)))))
        (build-dependency-tree)
        (clean-dependencies)))
+
+
+(def example
+  (string/trim (slurp (io/resource "example-data.txt"))))
+

@@ -42,8 +42,8 @@
                       "  +-a-org:a-pkg:a-ver"
                       "  +-b-org:b-pkg:b-ver"
                       "  | +-c-org:c-pkg:c-ver"
+                      "  |   +-d-org:d-pkg:d-ver"
                       "  |"
-                      "  +-d-org:d-pkg:d-ver"
                       "  +-e-org:e-pkg:e-ver"
                       "  | +-f-org:f-pkg:f-ver"])
         root (dep "org" "pkg" "ver")
@@ -53,27 +53,14 @@
         d    (dep "d-org" "d-pkg" "d-ver")
         e    (dep "e-org" "e-pkg" "e-ver")
         f    (dep "f-org" "f-pkg" "f-ver")]
-    (is (= {root #{a b d e}
+    (is (= {root #{a b e}
             a    #{}
             b    #{c}
-            c    #{}
+            c    #{d}
             d    #{}
             e    #{f}
             f    #{}}
            (parse-dependency-tree tree)))))
-
-
-(clojure.pprint/pprint
- (let [tree (mktree ["org:pkg:ver"
-                     "  +-a:a:a"
-                     "  +-b:b:b"
-                     "    +-c:c:c"])
-       root (dep "org" "pkg" "ver")
-       a    (dep "a" "a" "a")
-       b    (dep "b" "b" "b")
-       c    (dep "c" "c" "c")]
-   (parse-dependency-tree tree)))
-
 
 
 
