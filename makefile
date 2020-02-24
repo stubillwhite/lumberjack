@@ -11,7 +11,9 @@ PROJECTS=\
 	$(HOME)/Dev/recommenders/recs-aws/build.sbt \
 	$(HOME)/Dev/recommenders/recs-aws-test/build.sbt \
 	$(HOME)/Dev/recommenders/recs-spark-test/build.sbt \
-	$(HOME)/Dev/recommenders/recs-validation/build.sbt
+	$(HOME)/Dev/recommenders/recs-validation/build.sbt \
+	$(HOME)/Dev/recommenders/recommender-app-common/build.sbt \
+	$(HOME)/Dev/recommenders/recs-sutd-recs-generator/build.sbt
 
 DEPS=$(PROJECTS:build.sbt=build-dependencies.txt)
 

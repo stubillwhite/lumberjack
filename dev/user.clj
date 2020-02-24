@@ -14,6 +14,8 @@
             [mount.core :as mount]
             [lumberjack.config :refer [config]]
             [lumberjack.app :refer [nrepl]]
+            [lumberjack.core :as core]
+            [lumberjack.analysis :as analysis]
             [taoensso.nippy :as nippy]
             [taoensso.timbre :as timbre])
   (:import [java.io DataInputStream DataOutputStream]))
@@ -44,3 +46,8 @@
 (defn reset []
   (stop)
   (refresh :after 'user/start))
+
+;;
+
+(defn dependency-clash-report []
+  (clojure.pprint/pprint (analysis/dependency-clashes (core/load-projects config))))
