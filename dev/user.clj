@@ -47,7 +47,8 @@
   (stop)
   (refresh :after 'user/start))
 
-;;
+;; Test functions
 
 (defn dependency-clash-report []
   (clojure.pprint/pprint (analysis/dependency-clashes (core/load-projects config))))
+

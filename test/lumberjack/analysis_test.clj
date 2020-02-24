@@ -22,8 +22,9 @@
                 "project-c" {non-clashing-2 nil
                              clashing-2     nil}})
 
-
 (deftest dependency-clashes-given-some-dependency-clashes-then-identifies
   (let [expected {{:org "org-b" :pkg "pkg-b"} #{{:ver "clashing-1"} {:ver "clashing-2"}}}]
     (is (= expected (dependency-clashes projects)))))
 
+(deftest projects-referencing-given-common-dependency-then-returns-all-referencing-projects
+  (is (= #{"project-a" "project-b"} (projects-referencing projects non-clashing-1))))
