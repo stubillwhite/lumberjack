@@ -6,4 +6,5 @@
             "/Users/white1/Dev/recommenders/recs-spark-test/build.sbt"
             "/Users/white1/Dev/recommenders/recs-validation/build.sbt"
             "/Users/white1/Dev/recommenders/recommender-app-common/build.sbt"
-            "/Users/white1/Dev/recommenders/recs-sutd-recs-generator/build.sbt"]}
+            "/Users/white1/Dev/recommenders/recs-sutd-recs-generator/build.sbt"
+            "/Users/white1/Dev/recommenders/recs-mendeley-suggest/build.sbt"]}

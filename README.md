@@ -16,6 +16,7 @@ Helping clean up your dependency tree forest.
 ## Future things ##
 
 - [ ] Integrate with SBT and pull the dependency information out rather than parsing it
+- [ ] Integrate with Maven repositories and pull dependencies from what was built
 - [ ] Handle semantic versioning
 - [ ] Handle Scala versioning
 - [ ] Query repositories to find when dependencies are outdated

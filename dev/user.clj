@@ -50,5 +50,5 @@
 ;; Test functions
 
 (defn dependency-clash-report []
-  (clojure.pprint/pprint (analysis/dependency-clashes (core/load-projects config))))
+  (clojure.pprint/pprint (analysis/clashes (core/load-projects config))))
 

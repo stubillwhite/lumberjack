@@ -26,6 +26,9 @@
 
 (def projects (load-projects config))
 
+(defn- add-dependency-canonical-name [{:keys [org pkg ver] :as dep}]
+  (assoc dep :id (str org ":" pkg ":" ver)))
+
 ;; Public
 
 (defn project-names
@@ -36,14 +39,12 @@
 (defn dependencies
   "Return a list of the dependencies."
   []
-  (->> projects
-       (vals)
-       (map keys)
-       (flatten)))
+  (map add-dependency-canonical-name (analysis/dependencies projects)))
 
-;; TODO: Return types need some thought
 (defn clashes
   "Return a list of the dependency clashes."
   []
-  (list (analysis/dependency-clashes projects)))
+  (map add-dependency-canonical-name (analysis/clashes projects)))
+
+
 

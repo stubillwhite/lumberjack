@@ -7,6 +7,7 @@
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.defaults :refer [wrap-defaults]]
+            [ring.middleware.cors :refer [wrap-cors]]
             [ring.middleware.json
              :refer
              [wrap-json-body wrap-json-params wrap-json-response]]
@@ -20,17 +21,20 @@
 (defn- with-response-defaults
   ([response]
     (-> response
-      (content-type "application/json"))))
+        (content-type "application/json"))))
 
 (defroutes app-routes
   (context "/projects" []
-           (GET  "/" {params :params} (core/project-names)))
+           (GET  "/" {params :params}
+                 (response {:projects (core/project-names)})))
 
   (context "/dependencies" []
-           (GET  "/" {params :params} (core/dependencies)))
+           (GET  "/" {params :params}
+                 (response (core/dependencies))))
 
   (context "/clashes" []
-           (GET  "/" {params :params} (core/clashes)))
+           (GET  "/" {params :params}
+                 (response (core/clashes))))
   
   (GET "/" [] (redirect "/index.html"))
   (route/resources "/")
@@ -55,10 +59,12 @@
   (-> app-routes
       (wrap-log-request)
       (wrap-defaults default-config)
+      (wrap-cors :access-control-allow-origin [#".*"] :access-control-allow-methods [:get :put :post :delete])
       (wrap-json-body)
       (wrap-json-params)
       (wrap-json-response)
-      (wrap-content-type)))
+      (wrap-content-type)
+      ))
 
 (def- state (atom {:server nil}))
 
@@ -69,4 +75,5 @@
            (do
              (.stop (:server @state))
              (swap! state assoc :server nil))))
+
 

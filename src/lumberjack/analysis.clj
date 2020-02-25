@@ -25,17 +25,27 @@
 (defn artifact-to-project-map [projects]
   (->> (flattened-dependencies projects)
        (group-by (fn [x] (select-keys x [:org :pkg :ver])))
-       (map-vals (fn [x] (into #{} (map :prj x))))
-       ))
+       (map-vals (fn [x] (into #{} (map :prj x))))))
 
 ;; Public
 
-(defn dependency-clashes
-  "Return a map of {:org org :pkg pkg} to {:ver version} of all clashing dependencies in the projects."
+(defn dependencies
+  "Return a list of all dependencies."
   [projects]
-  (into {} (filter
-            (fn [[k vs]] (> (count vs) 1))
-            (artifact-to-version-map projects))))
+  (->> projects
+       (vals)
+       (map keys)
+       (flatten)
+       (filter identity)
+       (into #{})))
+
+(defn clashes
+  "Return a list of all clashing dependencies."
+  [projects]
+  (->>
+   (for [[k vs] (artifact-to-version-map projects) :when (> (count vs) 1)]
+     (for [v vs] (merge k v)))
+   (flatten)))
 
 (defn projects-referencing
   "Return a set of the projects which reference the dependency."
