@@ -1,0 +1,5 @@
+^{:watch-dirs ["test" "src"]
+  :css-dirs ["resources/public/css"]
+  :auto-testing true}
+{:main            client.core
+ :closure-defines {client.api/base-url "http://localhost:8080"}}
