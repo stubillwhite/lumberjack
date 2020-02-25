@@ -13,7 +13,6 @@
             [clojure.tools.trace :refer [trace-forms trace-ns untrace-ns]]
             [mount.core :as mount]
             [lumberjack.config :refer [config]]
-            [lumberjack.app :refer [nrepl]]
             [lumberjack.core :as core]
             [lumberjack.analysis :as analysis]
             [taoensso.nippy :as nippy]
