@@ -1,6 +1,6 @@
 # lumberjack #
 
-Helping clean up your dependency tree forest.
+Quick hackday project to try to tame our forest of dependencies.
 
 ## Stuff to do ##
 
@@ -8,7 +8,7 @@ Helping clean up your dependency tree forest.
 - [X] Find clashes
 - [X] Trace dependencies to particular projects
 - [X] Basic REST API
-- [ ] Basic UI
+- [X] Basic UI
 - [ ] Add target rules
 - [ ] Find dependencies satisfying and not satisfying the target rules
 - [ ] Automatic upgrade of dependencies using target rules
