@@ -107,7 +107,7 @@
       (and disp-clashing disp-non-clashing) (:dependencies @state)
       disp-clashing                         (filter clashing? (:dependencies @state))
       disp-non-clashing                     (filter (complement clashing?) (:dependencies @state))
-      :else                                 [{:id "nada"}])))
+      :else                                 [])))
 
 (defn view []
   [:div
