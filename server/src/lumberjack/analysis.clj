@@ -29,6 +29,11 @@
 
 ;; Public
 
+(defn projects
+  "Return a list of all projects."
+  [projects]
+  (keys projects))
+
 (defn dependencies
   "Return a list of all dependencies."
   [projects]

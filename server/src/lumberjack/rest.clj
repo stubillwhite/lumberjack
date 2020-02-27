@@ -26,7 +26,7 @@
 (defroutes app-routes
   (context "/projects" []
            (GET  "/" {params :params}
-                 (response {:projects (core/project-names)})))
+                 (response (core/projects))))
 
   (context "/dependencies" []
            (GET  "/" {params :params}
@@ -63,8 +63,7 @@
       (wrap-json-body)
       (wrap-json-params)
       (wrap-json-response)
-      (wrap-content-type)
-      ))
+      (wrap-content-type)))
 
 (def- state (atom {:server nil}))
 

@@ -48,6 +48,14 @@
 
 ;; Test functions
 
-(defn dependency-clash-report []
-  (clojure.pprint/pprint (analysis/clashes (core/load-projects config))))
+(defn dependency-report []
+  (->> (core/dependencies)
+       (map (fn [{:keys [org pkg ver]}] (str org ":" pkg ":" ver)))
+       (sort)
+       (pprint)))
 
+(defn dependency-clash-report []
+  (->> (core/clashes)
+       (map (fn [{:keys [org pkg ver]}] (str org ":" pkg ":" ver)))
+       (sort)
+       (pprint)))

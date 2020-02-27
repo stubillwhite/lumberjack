@@ -1,12 +1,12 @@
 (ns lumberjack.core
-  (:require
-   [taoensso.timbre :as timbre]
-   [taoensso.timbre.appenders.core :as appenders]
-   [lumberjack.config :refer [config]]
-   [lumberjack.parsers.sbt :as sbt]
-   [clojure.string :as string]
-   [clojure.java.io :as io]
-   [lumberjack.analysis :as analysis]))
+  (:require [clojure.java.io :as io]
+            [clojure.string :as string]
+            [lumberjack.analysis :as analysis]
+            [lumberjack.config :refer [config]]
+            [lumberjack.parsers.sbt :as sbt]
+            [lumberjack.utils :refer [def-]]
+            [taoensso.timbre :as timbre]
+            [taoensso.timbre.appenders.core :as appenders]))
 
 (timbre/refer-timbre)
 
@@ -16,35 +16,37 @@
   {:appenders {:spit (appenders/spit-appender {:fname "lumberjack.log"})}})
 
 (defn- load-project-dependencies [path]
+  (info (str "Loading '" path "'"))
   (->> (io/file path)
        (slurp)
        (string/trim)
        (sbt/parse-dependency-tree)))
 
-(defn load-projects [config]
-  (into {} (for [p (:projects config)] [p (load-project-dependencies p)])))
+(def- project-data (atom nil))
 
-(def projects (load-projects config))
+(defn load-project-data! [config]
+  (swap! project-data
+         (fn [x] (into {} (for [p (:projects config)] [p (load-project-dependencies p)])))))
 
-(defn- add-dependency-canonical-name [{:keys [org pkg ver] :as dep}]
-  (assoc dep :id (str org ":" pkg ":" ver)))
+(load-project-data! config)
+
+(defn- to-canonical-dependency-name [{:keys [org pkg ver] :as dep}]
+  {:id (str org ":" pkg ":" ver)})
 
 ;; Public
 
-(defn project-names
+(defn projects
   "Return a list of the project names."
   []
-  (keys projects))
+  (analysis/projects @project-data))
 
 (defn dependencies
   "Return a list of the dependencies."
   []
-  (map add-dependency-canonical-name (analysis/dependencies projects)))
+  (map to-canonical-dependency-name (analysis/dependencies @project-data)))
 
 (defn clashes
   "Return a list of the dependency clashes."
   []
-  (map add-dependency-canonical-name (analysis/clashes projects)))
-
-
+  (map to-canonical-dependency-name (analysis/clashes @project-data)))
 
