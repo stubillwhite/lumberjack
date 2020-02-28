@@ -50,12 +50,12 @@
 
 (defn dependency-report []
   (->> (core/dependencies)
-       (map (fn [{:keys [org pkg ver]}] (str org ":" pkg ":" ver)))
+       (map :id)
        (sort)
        (pprint)))
 
 (defn dependency-clash-report []
   (->> (core/clashes)
-       (map (fn [{:keys [org pkg ver]}] (str org ":" pkg ":" ver)))
+       (map :id)
        (sort)
        (pprint)))
