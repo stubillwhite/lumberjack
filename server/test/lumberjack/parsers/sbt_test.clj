@@ -6,10 +6,11 @@
     [lumberjack.utils :refer [def-]]))
 
 (deftest parse-sbt-dependency-then-extracts
-  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 0} (parse-sbt-dependency "org:pkg:ver")))
-  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 1} (parse-sbt-dependency "  +-org:pkg:ver")))
-  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 2} (parse-sbt-dependency "  | +-org:pkg:ver")))
-  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 3} (parse-sbt-dependency "  | | +-org:pkg:ver"))))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 0 :evicted nil}    (parse-sbt-dependency "org:pkg:ver")))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 1 :evicted nil}    (parse-sbt-dependency "  +-org:pkg:ver")))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 2 :evicted nil}    (parse-sbt-dependency "  | +-org:pkg:ver")))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 3 :evicted nil}    (parse-sbt-dependency "  | | +-org:pkg:ver")))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 3 :evicted "ver2"} (parse-sbt-dependency "  | | +-org:pkg:ver (evicted by: ver2)"))))
 
 (defn- mktree [coll]
   (->> coll
@@ -45,6 +46,8 @@
                       "  |   +-d-org:d-pkg:d-ver"
                       "  |"
                       "  +-e-org:e-pkg:e-ver"
+                      "  | +-d-org:d-pkg:d-ver2 (evicted by: d-ver)"
+                      "  | | +-g-org:g-pkg:g-ver"
                       "  | +-f-org:f-pkg:f-ver"])
         root (dep "org" "pkg" "ver")
         a    (dep "a-org" "a-pkg" "a-ver")
@@ -61,9 +64,3 @@
             e    #{f}
             f    #{}}
            (parse-dependency-tree tree)))))
-
-
-
-
-
-

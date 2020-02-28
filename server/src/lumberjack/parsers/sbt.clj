@@ -1,13 +1,29 @@
 (ns lumberjack.parsers.sbt
   (:require [clojure.java.io :as io]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [taoensso.timbre :as timbre]))
+
+(timbre/refer-timbre)
 
 ;; Internal
 
 (defn parse-sbt-dependency [s]
-  (let [level           (/ (or (string/index-of s "+") 0) 2)
-        [_ org pkg ver] (re-find #"^[-\|+ ]*([^:]+):([^:]+):([^ ]+)" s)]
-    {:org org :pkg pkg :ver ver :level level}))
+  (let [level                   (/ (or (string/index-of s "+") 0) 2)
+        [_ org pkg ver evicted] (re-find #"^[-\|+ ]*([^:]+):([^:]+):([^ ]+)(?: \(evicted by: (.+)\))?" s)]
+    {:org org :pkg pkg :ver ver :level level :evicted evicted}))
+
+(defn- remove-non-dependencies [deps]
+  (filter (fn [d] (not (nil? (:org d)))) deps))
+
+(defn- remove-evictions [deps]
+  (loop [non-evicted []
+         deps        deps]
+    (if (empty? deps)
+      non-evicted
+      (let [[d & ds] deps]
+        (if (:evicted d)
+          (recur non-evicted (drop-while (fn [{:keys [level]}] (> level (:level d))) ds))
+          (recur (conj non-evicted d) ds))))))
 
 (defn- build-dependency-tree [deps]
   (loop [deps  deps
@@ -26,8 +42,8 @@
         (recur ds new-path new-graph)))))
 
 (defn- clean-dependencies [tree]
-  (into {} (for [[k vs] tree] [(dissoc k :level)
-                               (into #{} (map (fn [x] (dissoc x :level)) vs))])))
+  (into {} (for [[k vs] tree] [(select-keys k [:org :pkg :ver])
+                               (into #{} (map (fn [x] (select-keys x [:org :pkg :ver])) vs))])))
 
 ;; Public
 
@@ -37,6 +53,7 @@
   (->> (string/split txt #"\n")
        (map (fn [s] (string/replace-first s #"\[info\] " "")))
        (map parse-sbt-dependency)
-       (filter (fn [dep] (not (nil? (:org dep)))))
+       (remove-non-dependencies)
+       (remove-evictions)
        (build-dependency-tree)
        (clean-dependencies)))

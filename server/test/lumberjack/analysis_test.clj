@@ -28,4 +28,4 @@
     (is (= expected (clashes stub-project-data)))))
 
 (deftest projects-referencing-given-common-dependency-then-returns-all-referencing-projects
-  (is (= #{"project-a" "project-b"} (projects-referencing projects non-clashing-1))))
+  (is (= #{"project-a" "project-b"} (projects-referencing stub-project-data non-clashing-1))))
