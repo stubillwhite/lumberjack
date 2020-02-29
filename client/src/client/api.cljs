@@ -18,6 +18,10 @@
    (merge params
           {:with-credentials? false})))
 
+(defn reload [f]
+  (go (f (<! (http/post (str api-url "/reload")
+                        (-> (with-credentials)))))))
+
 (defn get-projects [f]
   (go (f (<! (http/get (str api-url "/projects")
                        (with-credentials))))))

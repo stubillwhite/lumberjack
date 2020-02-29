@@ -37,10 +37,18 @@
          200 (update-state! #(assoc-in % [:clashes] (into #{} (map :id (decode-response body)))))
          (ant/message-error "Unable to load clashes."))))))
 
-(defn- reload-data []
+(defn- load-data! []
   (load-projects!)
   (load-clashes!)
   (load-dependencies!))
+
+(defn- reload-data []
+  (api/reload
+   (fn [response]
+     (let [{:keys [status body]} response]
+       (case status
+         200 (load-data!)
+         (ant/message-error "Unable to reload data."))))))
 
 (defn- get-dependencies-for-project! [name]
   (api/get-dependencies-for-project name
@@ -52,7 +60,7 @@
 
 (defn- refresh-button []
   [ant/form-item {}
-   [ant/button {:type "primary" :on-click reload-data} "Reload"]])
+   [ant/button {:type "primary" :on-click reload-data} "Load project data"]])
 
 (defn- select-project! [name]
   (update-state! assoc :selected-project name)
@@ -111,17 +119,21 @@
     [ant/row
      [ant/col {:span 1} [ant/switch {:default-checked true :on-click (partial set-state-flag [:display-non-clashing])}]]
      [ant/col {:span 4} [:p "Display non-clashing"]]]
+    [ant/row
+     [ant/col {:span 1} [ant/switch {:default-checked false :on-click (partial set-state-flag [:display-project-only])}]]
+     [ant/col {:span 4} [:p "Selected project-only"]]]
     ]])
 
+(defn- conditional-filter [active? f coll]
+  (if active? (filter f coll) coll))
+
 (defn- selected-dependencies []
-  (let [disp-clashing     (:display-clashing @state)
-        disp-non-clashing (:display-non-clashing @state)
-        clashing?         (fn [x] (contains? (:clashes @state) (:id x)))]
-    (cond
-      (and disp-clashing disp-non-clashing) (:dependencies @state)
-      disp-clashing                         (filter clashing? (:dependencies @state))
-      disp-non-clashing                     (filter (complement clashing?) (:dependencies @state))
-      :else                                 [])))
+  (let [clashing?            (fn [x] (contains? (:clashes @state) (:id x)))
+        in-selected-project? (fn [x] (contains? (:selected-dependencies @state) (:id x)))]
+    (->> (:dependencies @state)
+         (conditional-filter (not (:display-clashing @state))     (complement clashing?))
+         (conditional-filter (not (:display-non-clashing @state)) clashing?)
+         (conditional-filter (:display-project-only @state)       in-selected-project?))))
 
 (defn view []
   [:div

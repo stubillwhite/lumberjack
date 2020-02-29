@@ -25,19 +25,23 @@
 
 (defroutes app-routes
   (context "/projects" []
-           (GET  "/" {params :params}
+           (GET  "/" {params :json-params}
                  (response (core/projects))))
 
   (context "/dependencies" []
-           (GET  "/" {params :params}
+           (GET  "/" {params :json-params}
                  (response (core/dependencies))))
 
   (context "/project-dependencies" []
            (POST  "/" {params :json-params}
                   (response (core/dependencies-for-project (get-in params ["name"])))))
+
+  (context "/reload" []
+           (POST  "/" {params :json-params}
+                  (response (core/load-project-data!))))
   
   (context "/clashes" []
-           (GET  "/" {params :params}
+           (GET  "/" {params :json-params}
                  (response (core/clashes))))
   
   (GET "/" [] (redirect "/index.html"))

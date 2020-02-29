@@ -2,7 +2,7 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
             [lumberjack.analysis :as analysis]
-            [lumberjack.config :refer [config]]
+            [lumberjack.config :refer [config] :as cfg]
             [lumberjack.parsers.sbt :as sbt]
             [lumberjack.utils :refer [def-]]
             [taoensso.timbre :as timbre]
@@ -24,11 +24,10 @@
 
 (def- project-data (atom nil))
 
-(defn load-project-data! [config]
-  (swap! project-data
-         (fn [x] (into {} (for [p (:projects config)] [p (load-project-dependencies p)])))))
-
-(load-project-data! config)
+(defn load-project-data! []
+  (let [project-config (cfg/load-config (:project-config config))]
+    (swap! project-data
+           (fn [x] (into {} (for [p (:projects project-config)] [p (load-project-dependencies p)]))))))
 
 (defn- to-canonical-dependency-name [{:keys [org pkg ver] :as dep}]
   {:id (str org ":" pkg ":" ver)})

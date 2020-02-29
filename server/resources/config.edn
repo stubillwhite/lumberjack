@@ -1,9 +1,5 @@
 {:nrepl {:host "0.0.0.0"
          :port 7878}
 
- :projects ["/Users/white1/Dev/recommenders/recs-aws/build-dependencies.txt"
-            "/Users/white1/Dev/recommenders/recs-aws-test/build-dependencies.txt"
-            "/Users/white1/Dev/recommenders/recs-spark-test/build-dependencies.txt"
-            "/Users/white1/Dev/recommenders/recs-validation/build-dependencies.txt"
-            "/Users/white1/Dev/recommenders/recs-sutd-recs-generator/build-dependencies.txt"
-            "/Users/white1/Dev/recommenders/recs-mendeley-suggest/build-dependencies.txt"]}
+ :project-config "/Users/white1/Dev/my-stuff/lumberjack/server/project-config.edn"
+}
