@@ -30,3 +30,7 @@
   (go (f (<! (http/get (str api-url "/clashes")
                        (with-credentials))))))
 
+(defn get-dependencies-for-project [project-name f]
+  (go (f (<! (http/post (str api-url "/project-dependencies")
+                        (-> {:json-params {:name project-name}}
+                            (with-credentials)))))))

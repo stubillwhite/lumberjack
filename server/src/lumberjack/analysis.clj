@@ -52,6 +52,14 @@
      (for [v vs] (merge k v)))
    (flatten)))
 
+(defn dependencies-for-project
+  "Returns a set of the dependencies in the project."
+  [projects name]
+  (->> (get projects name)
+       (keys)
+       (flatten)
+       (into #{})))
+
 (defn projects-referencing
   "Return a set of the projects which reference the dependency."
   [projects dep]

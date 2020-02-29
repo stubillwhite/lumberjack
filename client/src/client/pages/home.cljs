@@ -42,9 +42,21 @@
   (load-clashes!)
   (load-dependencies!))
 
+(defn- get-dependencies-for-project! [name]
+  (api/get-dependencies-for-project name
+   (fn [response]
+     (let [{:keys [status body]} response]
+       (case status
+         200 (update-state! #(assoc-in % [:selected-dependencies] (into #{} (map :id (decode-response body)))))
+         (ant/message-error "Unable to load dependencies for project."))))))
+
 (defn- refresh-button []
   [ant/form-item {}
    [ant/button {:type "primary" :on-click reload-data} "Reload"]])
+
+(defn- select-project! [name]
+  (update-state! assoc :selected-project name)
+  (get-dependencies-for-project! name))
 
 (defn project-table [data]
   [ant/table 
@@ -52,6 +64,10 @@
     :dataSource data
     :pagination false
     :row-key    :name
+    :on-row     (fn [row] (js-obj "onClick" #(let [r (js->clj row :keywordize-keys true)]
+                                              (select-project! (:name r)))))
+    :rowClassName (fn [row idx] (let [r (js->clj row :keywordize-keys true)]
+                                 (when (= (:name r) (:selected-project @state)) "selected-row")))
     :size       :small
     }])
 
@@ -63,7 +79,7 @@
 (defn dependency-canonical-name [{:keys [org pkg ver]}]
   (str org ":" pkg ":" ver))
 
-(defn clashing-tag [key row idx]
+(defn clash-status [key row idx]
   (let [id       (:id (js->clj row :keywordize-keys true))
         clashing (:clashes @state)]
     (if (contains? clashing id)
@@ -73,14 +89,12 @@
 (defn dependencies-table [data]
   [ant/table 
    {:columns    [{:title "Dependency" :dataIndex :id :key :id}
-                 {:title "Status"     :dataIndex :id :key (fn [row] (str (:id row) "-status")) :render clashing-tag}] 
+                 {:title "Status"     :dataIndex :id :key (fn [row] (str (:id row) "-status")) :render clash-status}] 
     :dataSource    data
     :pagination    false
     :row-key       :id
-    :row-selection {:on-change (fn [idx row]
-                                 (let [selected (js->clj row :keywordize-keys true)]
-                                   (ant/message-info (str "You have selected: " (map :id selected)))))}
-    :onRow        (fn [row idx] {:on-click (fn [event] (ant/message-info (str "Clicked on " idx)))})
+    :rowClassName (fn [row idx] (let [r (js->clj row :keywordize-keys true)]
+                                 (when (contains? (:selected-dependencies @state) (:id r)) "selected-row")))
     :size          "small"
     :scroll        {:y 500}}])
 

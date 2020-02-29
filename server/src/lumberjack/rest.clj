@@ -32,6 +32,10 @@
            (GET  "/" {params :params}
                  (response (core/dependencies))))
 
+  (context "/project-dependencies" []
+           (POST  "/" {params :json-params}
+                  (response (core/dependencies-for-project (get-in params ["name"])))))
+  
   (context "/clashes" []
            (GET  "/" {params :params}
                  (response (core/clashes))))
@@ -74,5 +78,3 @@
            (do
              (.stop (:server @state))
              (swap! state assoc :server nil))))
-
-

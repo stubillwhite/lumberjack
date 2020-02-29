@@ -50,3 +50,7 @@
   []
   (map to-canonical-dependency-name (analysis/clashes @project-data)))
 
+(defn dependencies-for-project
+  "Return a list of the dependencies."
+  [name]
+  (map to-canonical-dependency-name (analysis/dependencies-for-project @project-data name)))
