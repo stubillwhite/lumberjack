@@ -49,7 +49,7 @@
            (GET  "/" {params :json-params}
                  (response (core/clashes))))
   
-  (GET "/" [] (redirect "/web/index.html"))
+  (GET "/" [] (redirect "/index.html"))
   (route/resources "/")
   (route/not-found (not-found "Not found")))
 
