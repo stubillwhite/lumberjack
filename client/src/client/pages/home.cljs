@@ -13,6 +13,8 @@
   (->> (.parse js/JSON body)
        (utils/to-clj)))
 
+;; TODO: Move to API
+
 (defn- load-projects! []
   (api/get-projects
    (fn [response]
@@ -58,13 +60,25 @@
          200 (update-state! #(assoc-in % [:selected-dependencies] (into #{} (map :id (decode-response body)))))
          (ant/message-error "Unable to load dependencies for project."))))))
 
+(defn convert-nodes [m]
+  (into [] (apply concat (for [[k v] m] [{:id (str k) :children (convert-nodes v)}]))))
+
+(defn- get-graph-for-project! [name]
+  (api/get-graph-for-project name
+   (fn [response]
+     (let [{:keys [status body]} response]
+       (case status
+         200 (update-state! #(assoc-in % [:selected-graph] (into [] (convert-nodes (decode-response body)))))
+         (ant/message-error "Unable to load graph for project."))))))
+
 (defn- refresh-button []
   [ant/form-item {}
    [ant/button {:type "primary" :on-click reload-data} "Load project data"]])
 
 (defn- select-project! [name]
   (update-state! assoc :selected-project name)
-  (get-dependencies-for-project! name))
+  (get-dependencies-for-project! name)
+  (get-graph-for-project! name))
 
 (defn project-table [data]
   [ant/table 

@@ -27,7 +27,8 @@
 (defn load-project-data! []
   (let [project-config (cfg/load-config (:project-config config))]
     (swap! project-data
-           (fn [x] (into {} (for [p (:projects project-config)] [p (load-project-dependencies p)]))))))
+           (fn [x] (into {} (for [p (:projects project-config)] [p (load-project-dependencies p)]))))
+    nil))
 
 (defn- to-canonical-dependency-name [{:keys [org pkg ver] :as dep}]
   {:id (str org ":" pkg ":" ver)})
@@ -53,3 +54,19 @@
   "Return a list of the dependencies."
   [name]
   (map to-canonical-dependency-name (analysis/dependencies-for-project @project-data name)))
+
+(defn dependency-graph-for-project
+  "Return a graph of the dependencies."
+  [name]
+  (->> (io/file "/Users/white1/Dev/recommenders/recs-aws-test/build-dependencies.txt")
+       (slurp)
+       (string/trim)
+       (sbt/get-graph)))
+
+(defn convert-nodes [m]
+  (into [] (apply concat (for [[k v] m] [{:id (str k) :children (convert-nodes v)}]))))
+
+;; (clojure.pprint/pprint (convert-nodes (dependency-graph-for-project "foo")))
+;; (clojure.pprint/pprint (dependency-graph-for-project "foo"))
+
+

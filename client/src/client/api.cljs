@@ -38,3 +38,8 @@
   (go (f (<! (http/post (str api-url "/project-dependencies")
                         (-> {:json-params {:name project-name}}
                             (with-credentials)))))))
+
+(defn get-graph-for-project [project-name f]
+  (go (f (<! (http/post (str api-url "/project-graph")
+                        (-> {:json-params {:name project-name}}
+                            (with-credentials)))))))

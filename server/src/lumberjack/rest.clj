@@ -36,6 +36,15 @@
            (POST  "/" {params :json-params}
                   (response (core/dependencies-for-project (get-in params ["name"])))))
 
+  (context "/project-graph2" []
+           (POST  "/" {params :json-params}
+                  (response {:a {:b {:c {}}
+                                 :d {:e {}}}})))
+
+  (context "/project-graph" []
+           (POST  "/" {params :json-params}
+                  (response (core/dependency-graph-for-project (get-in params ["name"])))))
+
   (context "/reload" []
            (POST  "/" {params :json-params}
                   (response (core/load-project-data!))))

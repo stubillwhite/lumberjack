@@ -57,3 +57,35 @@
        (remove-evictions)
        (build-dependency-tree)
        (clean-dependencies)))
+
+(defn canonical [{:keys [org pkg ver]}]
+  (str org ":" pkg ":" ver))
+
+(defn- build-graph [deps]
+  (loop [deps  deps
+         path  []
+         graph {}]
+    (if (empty? deps)
+      graph
+      (let [[d & ds]  deps
+            d-lvl     (get d :level)
+            new-path  (into [] (take (inc d-lvl) (assoc path d-lvl (canonical d))))]
+        (recur ds new-path
+               (assoc-in graph new-path {}))))))
+
+(defn- mktree [coll]
+  (->> coll
+       (map (partial str "[info] "))
+       (string/join "\n")))
+
+(defn get-graph
+  "Parse the dependency tree into a graph."
+  [txt]
+  (->> (string/split txt #"\n")
+       (map (fn [s] (string/replace-first s #"\[info\] " "")))
+       (map parse-sbt-dependency)
+       (remove-non-dependencies)
+       (remove-evictions)
+       (build-graph)))
+
+;; TODO: Rationalise this
