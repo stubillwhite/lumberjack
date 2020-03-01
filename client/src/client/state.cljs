@@ -3,11 +3,9 @@
    [reagent.core :as reagent]))
 
 ;; Application state
-(defonce state (reagent/atom {:projects             []
-                              :dependencies         []
+(defonce state (reagent/atom {:project-names        []
+                              :all-dependencies     []
                               :clashes              []
-                              :display-clashing     true
-                              :display-non-clashing true
                               :router               {:page "home"}}))
 
 (defn update-state! [f & args]

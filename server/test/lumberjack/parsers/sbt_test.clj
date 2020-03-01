@@ -17,50 +17,35 @@
        (map (partial str "[info] "))
        (string/join "\n")))
 
-(defn- dep [org pkg ver]
-  {:org org :pkg pkg :ver ver})
-
-(deftest parse-dependency-tree-given-empty-tree-then-extracts
-  (is (= {(dep "org" "pkg" "ver") #{}} (parse-dependency-tree (mktree ["org:pkg:ver"])))))
-
-(deftest parse-dependency-tree-given-basic-tree-then-extracts
+(deftest parse-dependency-tree-given-nested-dependencies-then-parses-structure
   (let [tree (mktree ["org:pkg:ver"
                       "  +-a-org:a-pkg:a-ver"
-                      "  +-b-org:b-pkg:b-ver"
-                      "  | +-c-org:c-pkg:c-ver"])
-        root (dep "org" "pkg" "ver")
-        a    (dep "a-org" "a-pkg" "a-ver")
-        b    (dep "b-org" "b-pkg" "b-ver")
-        c    (dep "c-org" "c-pkg" "c-ver")]
-    (is (= {root #{a b}
-            a    #{}
-            b    #{c}
-            c    #{}}
+                      "  | +-b-org:b-pkg:b-ver"
+                      "  |   +-c-org:c-pkg:c-ver"
+                      "  |"
+                      "  +-d-org:d-pkg:d-ver"
+                      "    +-e-org:e-pkg:e-ver"
+                      "      +-f-org:f-pkg:f-ver"])]
+    (is (= {"org:pkg:ver"
+            {"a-org:a-pkg:a-ver"
+             {"b-org:b-pkg:b-ver"
+              {"c-org:c-pkg:c-ver" {}}}
+             "d-org:d-pkg:d-ver"
+             {"e-org:e-pkg:e-ver"
+              {"f-org:f-pkg:f-ver" {}}}}}
            (parse-dependency-tree tree)))))
 
-(deftest parse-dependency-tree-given-complex-tree-then-extracts
+(deftest parse-dependency-tree-given-evicted-dependencies-then-ignores-evicted-entries
   (let [tree (mktree ["org:pkg:ver"
-                      "  +-a-org:a-pkg:a-ver"
-                      "  +-b-org:b-pkg:b-ver"
-                      "  | +-c-org:c-pkg:c-ver"
-                      "  |   +-d-org:d-pkg:d-ver"
+                      "  +-a-org:a-pkg:a-ver (evicted by: a-ver2)"
+                      "  | +-b-org:b-pkg:b-ver"
+                      "  |   +-c-org:c-pkg:c-ver"
                       "  |"
-                      "  +-e-org:e-pkg:e-ver"
-                      "  | +-d-org:d-pkg:d-ver2 (evicted by: d-ver)"
-                      "  | | +-g-org:g-pkg:g-ver"
-                      "  | +-f-org:f-pkg:f-ver"])
-        root (dep "org" "pkg" "ver")
-        a    (dep "a-org" "a-pkg" "a-ver")
-        b    (dep "b-org" "b-pkg" "b-ver")
-        c    (dep "c-org" "c-pkg" "c-ver")
-        d    (dep "d-org" "d-pkg" "d-ver")
-        e    (dep "e-org" "e-pkg" "e-ver")
-        f    (dep "f-org" "f-pkg" "f-ver")]
-    (is (= {root #{a b e}
-            a    #{}
-            b    #{c}
-            c    #{d}
-            d    #{}
-            e    #{f}
-            f    #{}}
+                      "  +-a-org:a-pkg:a-ver2"
+                      "    +-b-org:b-pkg:b-ver2"
+                      "      +-c-org:c-pkg:c-ver2"])]
+    (is (= {"org:pkg:ver"
+            {"a-org:a-pkg:a-ver2"
+             {"b-org:b-pkg:b-ver2"
+              {"c-org:c-pkg:c-ver2" {}}}}}
            (parse-dependency-tree tree)))))

@@ -4,13 +4,15 @@
 
 (def unauthenticated-pages
   [{:id          "/home"
-    :label       "Home"
+    :label       "Projects"
+    :icon        "home"
     :view-fn     home/view
     :on-entry-fn home/on-entry
     :on-exit-fn  home/on-exit}
    
    {:id          "/visualise"
-    :label       "Visualise"
+    :label       "Search"
+    :icon        "search"
     :view-fn     visualise/view
     :on-entry-fn visualise/on-entry
     :on-exit-fn  visualise/on-exit}])

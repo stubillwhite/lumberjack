@@ -18,16 +18,16 @@
    (merge params
           {:with-credentials? false})))
 
-(defn reload [f]
-  (go (f (<! (http/post (str api-url "/reload")
+(defn load-project-data [f]
+  (go (f (<! (http/post (str api-url "/load-project-data")
                         (-> (with-credentials)))))))
 
-(defn get-projects [f]
-  (go (f (<! (http/get (str api-url "/projects")
+(defn get-project-names [f]
+  (go (f (<! (http/get (str api-url "/project-names")
                        (with-credentials))))))
 
-(defn get-dependencies [f]
-  (go (f (<! (http/get (str api-url "/dependencies")
+(defn get-all-dependencies [f]
+  (go (f (<! (http/get (str api-url "/all-dependencies")
                        (with-credentials))))))
 
 (defn get-clashes [f]
@@ -35,11 +35,11 @@
                        (with-credentials))))))
 
 (defn get-dependencies-for-project [project-name f]
-  (go (f (<! (http/post (str api-url "/project-dependencies")
+  (go (f (<! (http/post (str api-url "/dependencies-for-project")
                         (-> {:json-params {:name project-name}}
                             (with-credentials)))))))
 
 (defn get-graph-for-project [project-name f]
-  (go (f (<! (http/post (str api-url "/project-graph")
+  (go (f (<! (http/post (str api-url "/dependency-graph-for-project")
                         (-> {:json-params {:name project-name}}
                             (with-credentials)))))))

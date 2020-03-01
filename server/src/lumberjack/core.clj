@@ -2,7 +2,7 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
             [lumberjack.analysis :as analysis]
-            [lumberjack.config :refer [config] :as cfg]
+            [lumberjack.config :as cfg :refer [config]]
             [lumberjack.parsers.sbt :as sbt]
             [lumberjack.utils :refer [def-]]
             [taoensso.timbre :as timbre]
@@ -24,49 +24,45 @@
 
 (def- project-data (atom nil))
 
-(defn load-project-data! []
+;; Public
+
+(defn load-project-data!
+  "Load the project data from the files listed in the configuration file."
+  []
   (let [project-config (cfg/load-config (:project-config config))]
     (swap! project-data
            (fn [x] (into {} (for [p (:projects project-config)] [p (load-project-dependencies p)]))))
     nil))
 
-(defn- to-canonical-dependency-name [{:keys [org pkg ver] :as dep}]
-  {:id (str org ":" pkg ":" ver)})
-
-;; Public
-
-(defn projects
+(defn project-names
   "Return a list of the project names."
   []
-  (analysis/projects @project-data))
+  (->> (analysis/project-names @project-data)
+       (into [])
+       (sort)))
 
-(defn dependencies
+(defn all-dependencies
   "Return a list of the dependencies."
   []
-  (map to-canonical-dependency-name (analysis/dependencies @project-data)))
+  (->> (analysis/all-dependencies @project-data)
+       (into [])
+       (sort)))
 
 (defn clashes
   "Return a list of the dependency clashes."
   []
-  (map to-canonical-dependency-name (analysis/clashes @project-data)))
+  (->> (analysis/clashes @project-data)
+       (into [])
+       (sort)))
 
 (defn dependencies-for-project
   "Return a list of the dependencies."
   [name]
-  (map to-canonical-dependency-name (analysis/dependencies-for-project @project-data name)))
+  (->> (analysis/dependencies-for-project @project-data name)
+       (into [])
+       (sort)))
 
 (defn dependency-graph-for-project
   "Return a graph of the dependencies."
   [name]
-  (->> (io/file "/Users/white1/Dev/recommenders/recs-aws-test/build-dependencies.txt")
-       (slurp)
-       (string/trim)
-       (sbt/get-graph)))
-
-(defn convert-nodes [m]
-  (into [] (apply concat (for [[k v] m] [{:id (str k) :children (convert-nodes v)}]))))
-
-;; (clojure.pprint/pprint (convert-nodes (dependency-graph-for-project "foo")))
-;; (clojure.pprint/pprint (dependency-graph-for-project "foo"))
-
-
+  (analysis/dependency-graph-for-project @project-data name))

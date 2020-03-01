@@ -24,28 +24,23 @@
         (content-type "application/json"))))
 
 (defroutes app-routes
-  (context "/projects" []
+  (context "/project-names" []
            (GET  "/" {params :json-params}
-                 (response (core/projects))))
+                 (response (core/project-names))))
 
-  (context "/dependencies" []
+  (context "/all-dependencies" []
            (GET  "/" {params :json-params}
-                 (response (core/dependencies))))
+                 (response (core/all-dependencies))))
 
-  (context "/project-dependencies" []
+  (context "/dependencies-for-project" []
            (POST  "/" {params :json-params}
                   (response (core/dependencies-for-project (get-in params ["name"])))))
 
-  (context "/project-graph2" []
-           (POST  "/" {params :json-params}
-                  (response {:a {:b {:c {}}
-                                 :d {:e {}}}})))
-
-  (context "/project-graph" []
+  (context "/dependency-graph-for-project" []
            (POST  "/" {params :json-params}
                   (response (core/dependency-graph-for-project (get-in params ["name"])))))
 
-  (context "/reload" []
+  (context "/load-project-data" []
            (POST  "/" {params :json-params}
                   (response (core/load-project-data!))))
   

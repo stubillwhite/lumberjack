@@ -9,14 +9,13 @@
 (defn on-entry [])
 (defn on-exit [])
 
-;; TODO: I seem to get a double hit when selecting a project
-
 (def page-state (reagent/atom {:search-value  ""
                                :expanded-keys []}))
 
 (defn update-page-state! [f & args]
   (apply swap! page-state f args)
-  (js/console.log @page-state))
+  ;; (js/console.log @page-state)
+  )
 
 (def data2 [{:id "Functional languages"
             :children [{:id "CLR"
@@ -66,14 +65,11 @@
                                (update-page-state! assoc :expanded-keys (calculate-expanded-keys value (new-data)))
                                (update-page-state! assoc :override-expanded-keys true)))}])
 
-;; TODO: Doesn't work for multiple matches
 (defn highlight-match [s match]
   (if (and (not (= "" match)) (string/includes? s match))
-    (let [[before after] (string/split s (re-pattern match))]
-      (reagent.core/as-element [:span
-                                before
-                                [:span {:style {:color "Red"}} match]
-                                after]))
+    (let [non-matches (string/split s (re-pattern match))]
+      (reagent.core/as-element
+       (into [] (concat [:span] (drop-last (interleave non-matches (repeat [:span {:style {:color "Red"}} match])))))))
     s))
 
 (defn- create-tree [nodes match]
@@ -90,6 +86,6 @@
 
 (defn view []
   [:div
-   (page-description "Visualise" "Sort this out sometime")
+   (page-description "Dependency tree" (str "Dependency tree for '" (:selected-project @state) "'"))
    (search-field)
    (tree)])

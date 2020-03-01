@@ -16,7 +16,8 @@
             [lumberjack.core :as core]
             [lumberjack.analysis :as analysis]
             [taoensso.nippy :as nippy]
-            [taoensso.timbre :as timbre])
+            [taoensso.timbre :as timbre]
+            [clojure.string :as string])
   (:import [java.io DataInputStream DataOutputStream]))
 
 (defn print-methods [x]
@@ -45,17 +46,3 @@
 (defn reset []
   (stop)
   (refresh :after 'user/start))
-
-;; Test functions
-
-(defn dependency-report []
-  (->> (core/dependencies)
-       (map :id)
-       (sort)
-       (pprint)))
-
-(defn dependency-clash-report []
-  (->> (core/clashes)
-       (map :id)
-       (sort)
-       (pprint)))
