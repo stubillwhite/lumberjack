@@ -1,0 +1,3 @@
+#!/bin/bash
+pushd server/
+java -jar ./target/lumberjack-0.1.0-SNAPSHOT-standalone.jar

@@ -8,6 +8,7 @@
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.defaults :refer [wrap-defaults]]
             [ring.middleware.cors :refer [wrap-cors]]
+            [ring.middleware.resource :refer [wrap-resource]]
             [ring.middleware.json
              :refer
              [wrap-json-body wrap-json-params wrap-json-response]]
@@ -48,7 +49,7 @@
            (GET  "/" {params :json-params}
                  (response (core/clashes))))
   
-  (GET "/" [] (redirect "/index.html"))
+  (GET "/" [] (redirect "/web/index.html"))
   (route/resources "/")
   (route/not-found (not-found "Not found")))
 
@@ -72,6 +73,7 @@
       (wrap-log-request)
       (wrap-defaults default-config)
       (wrap-cors :access-control-allow-origin [#".*"] :access-control-allow-methods [:get :put :post :delete])
+      (wrap-resource "public")
       (wrap-json-body)
       (wrap-json-params)
       (wrap-json-response)
