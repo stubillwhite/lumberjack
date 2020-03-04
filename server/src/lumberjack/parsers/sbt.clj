@@ -10,8 +10,8 @@
 
 (defn parse-sbt-dependency [s]
   (let [level                   (/ (or (string/index-of s "+") 0) 2)
-        [_ org pkg ver evicted] (re-find #"^[-\|+ ]*([^:]+):([^:]+):([^ ]+)(?: \(evicted by: (.+)\))?" s)]
-    {:org org :pkg pkg :ver ver :level level :evicted evicted}))
+        [_ org pkg ver evicted] (re-find #"^[-\|+ ]*([^:]+):([^:]+):([^ ]+)( .*)?$" s)]
+    {:org org :pkg pkg :ver ver :level level :evicted (true? (and evicted (string/includes? evicted "evicted by:")))}))
 
 (defn- remove-non-dependencies [deps]
   (filter (fn [d] (not (nil? (:org d)))) deps))

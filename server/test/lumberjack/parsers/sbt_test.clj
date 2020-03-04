@@ -6,11 +6,12 @@
     [lumberjack.utils :refer [def-]]))
 
 (deftest parse-sbt-dependency-then-extracts
-  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 0 :evicted nil}    (parse-sbt-dependency "org:pkg:ver")))
-  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 1 :evicted nil}    (parse-sbt-dependency "  +-org:pkg:ver")))
-  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 2 :evicted nil}    (parse-sbt-dependency "  | +-org:pkg:ver")))
-  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 3 :evicted nil}    (parse-sbt-dependency "  | | +-org:pkg:ver")))
-  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 3 :evicted "ver2"} (parse-sbt-dependency "  | | +-org:pkg:ver (evicted by: ver2)"))))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 0 :evicted false} (parse-sbt-dependency "org:pkg:ver [S]")))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 1 :evicted false} (parse-sbt-dependency "  +-org:pkg:ver")))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 2 :evicted false} (parse-sbt-dependency "  | +-org:pkg:ver")))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 3 :evicted false} (parse-sbt-dependency "  | | +-org:pkg:ver")))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 3 :evicted true}  (parse-sbt-dependency "  | | +-org:pkg:ver (evicted by: ver2)")))
+  (is (= {:org "org" :pkg "pkg" :ver "ver" :level 3 :evicted true}  (parse-sbt-dependency "  | | +-org:pkg:ver (evicted by: ver..."))))
 
 (defn- mktree [coll]
   (->> coll
