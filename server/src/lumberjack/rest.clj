@@ -35,7 +35,7 @@
 
   (context "/dependencies-for-project" []
            (POST  "/" {params :json-params}
-                  (response (core/dependencies-for-project (get-in params ["name"])))))
+                  (response (core/dependencies-for-projects [(get-in params ["name"])]))))
 
   (context "/dependency-graph-for-project" []
            (POST  "/" {params :json-params}

@@ -46,3 +46,15 @@
 (defn reset []
   (stop)
   (refresh :after 'user/start))
+
+;;
+
+(defn pretty-clashes []
+  (println (string/join "\n" (core/clashes))))
+
+(defn pretty-paths [name]
+  (let [full-graph (into {} (for [name (core/project-names)]
+                              [name (core/dependency-graph-for-project name)]))]
+    (println (string/join "\n\n"
+                          (map (fn [path] (string/join "\n  " path))
+                               (analysis/paths-to-dependency name full-graph))))))

@@ -22,16 +22,13 @@
                          project-c {non-clashing-2 {}
                                     clashing-2     {}}})
 
-(deftest project-names-given-stub-data-then-returns-projects
-  (is (= [project-a project-b project-c] (project-names stub-project-data))))
-
-(deftest dependencies-for-project-given-stub-data-then-returns-dependencies-for-project
-  (is (= #{non-clashing-1 non-clashing-2}            (dependencies-for-project stub-project-data project-a)))
-  (is (= #{non-clashing-1 non-clashing-2 clashing-1} (dependencies-for-project stub-project-data project-b)))
-  (is (= #{non-clashing-2 clashing-2}                (dependencies-for-project stub-project-data project-c))))
+(deftest dependencies-for-projects-given-stub-data-then-returns-dependencies-for-projects
+  (is (= #{project-a non-clashing-1 non-clashing-2}            (dependencies-for-projects stub-project-data [project-a])))
+  (is (= #{project-b non-clashing-1 non-clashing-2 clashing-1} (dependencies-for-projects stub-project-data [project-b])))
+  (is (= #{project-c non-clashing-2 clashing-2}                (dependencies-for-projects stub-project-data [project-c]))))
 
 (deftest all-dependencies-given-stub-data-then-returns-all-dependencies
-  (is (= #{non-clashing-1 non-clashing-2 clashing-1 clashing-2}
+  (is (= #{project-a project-b project-c non-clashing-1 non-clashing-2 clashing-1 clashing-2}
          (all-dependencies stub-project-data))))
 
 (deftest clashes-given-clashing-dependencies-then-returns-clashing-dependencies
@@ -49,3 +46,7 @@
   (is (= {non-clashing-2 {}
           clashing-2 {}}
        (dependency-graph-for-project stub-project-data project-c))))
+
+(deftest paths-to-dependency-given-matching-dependency-then-returns-all-paths
+  (is (= [[project-b clashing-1] [project-c clashing-2]] (paths-to-dependency "pkg-b:clashing" stub-project-data))))
+

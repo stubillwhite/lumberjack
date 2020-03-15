@@ -1,6 +1,7 @@
 (ns lumberjack.analysis
   (:require [lumberjack.utils :refer [from-canonical-name to-canonical-name]]
-            [taoensso.timbre :as timbre]))
+            [taoensso.timbre :as timbre]
+            [clojure.string :as string]))
 
 (timbre/refer-timbre)
 
@@ -18,22 +19,17 @@
 
 ;; Public
 
-(defn project-names
-  "Return a list of the names of all projects."
-  [projects]
-  (keys projects))
-
-(defn dependencies-for-project
-  "Returns a set of the dependencies in the project."
-  [projects name]
-  (into #{} (flatten-dependencies (get projects name))))
+(defn dependencies-for-projects
+  "Returns a set of the dependencies in the specified projects."
+  [projects names]
+  (->> (select-keys projects names)
+       (flatten-dependencies)
+       (into #{})))
 
 (defn all-dependencies
   "Return a set of all dependencies."
   [projects]
-  (->> (project-names projects)
-       (mapcat (partial dependencies-for-project projects))
-       (into #{})))
+  (into #{} (dependencies-for-projects projects (keys projects))))
 
 (defn clashes
   "Return a set of all clashing dependencies."
@@ -47,11 +43,30 @@
 (defn projects-referencing
   "Return a set of the projects which reference the dependency."
   [projects dep]
-  (->> (for [prj (project-names projects)
-             :when (contains? (dependencies-for-project projects prj) dep)] prj)
+  (->> (for [prj (keys projects)
+             :when (contains? (dependencies-for-projects projects [prj]) dep)] prj)
        (into #{})))
 
 (defn dependency-graph-for-project
   "Return a graph of the project dependencies."
   [projects name]
   (get projects name))
+
+(defn- paths-to-matching-nodes
+  "Returns the paths from the root of graph g to the nodes matching the predicate."
+  [pred g]
+  (defn iter [paths ks g]
+    (reduce-kv
+     (fn [paths k v]
+       (if (pred k)
+         (conj paths (conj ks k))
+         (iter paths (conj ks k) v)))
+     paths
+     g))
+  (iter [] [] g))
+
+(defn paths-to-dependency
+  "Returns the paths from the root of graph g to the nodes matching the predicate."
+  [name g]
+  (paths-to-matching-nodes #(string/includes? % name) g))
+

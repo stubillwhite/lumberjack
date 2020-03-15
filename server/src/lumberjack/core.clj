@@ -29,40 +29,42 @@
 (defn load-project-data!
   "Load the project data from the files listed in the configuration file."
   []
-  (let [project-config (cfg/load-config (:project-config config))]
+  (let [project-config       (cfg/load-config (:project-config config))
+        project-dependencies (into {} (for [p (:projects project-config)] [p (load-project-dependencies p)]))
+        project-names        (into [] (:projects project-config))]
+    
     (swap! project-data
-           (fn [x] (into {} (for [p (:projects project-config)] [p (load-project-dependencies p)]))))
+           (fn [_] {:project-dependencies project-dependencies
+                   :project-names        project-names}))
     nil))
 
 (defn project-names
   "Return a list of the project names."
   []
-  (->> (analysis/project-names @project-data)
-       (into [])
-       (sort)))
+  (:project-names @project-data))
 
 (defn all-dependencies
   "Return a list of the dependencies."
   []
-  (->> (analysis/all-dependencies @project-data)
+  (->> (analysis/all-dependencies (:project-dependencies @project-data))
        (into [])
        (sort)))
 
 (defn clashes
   "Return a list of the dependency clashes."
   []
-  (->> (analysis/clashes @project-data)
+  (->> (analysis/clashes (:project-dependencies @project-data))
        (into [])
        (sort)))
 
-(defn dependencies-for-project
-  "Return a list of the dependencies."
-  [name]
-  (->> (analysis/dependencies-for-project @project-data name)
+(defn dependencies-for-projects
+  "Return a list of the dependencies for the specified projects."
+  [names]
+  (->> (analysis/dependencies-for-projects (:project-dependencies @project-data) names)
        (into [])
        (sort)))
 
 (defn dependency-graph-for-project
   "Return a graph of the dependencies."
   [name]
-  (analysis/dependency-graph-for-project @project-data name))
+  (analysis/dependency-graph-for-project (:project-dependencies @project-data) name))

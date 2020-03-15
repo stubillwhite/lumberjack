@@ -2,6 +2,6 @@
             "/Users/white1/Dev/recommenders/recs-aws/build-dependencies.txt"
             "/Users/white1/Dev/recommenders/recs-aws-test/build-dependencies.txt"
             "/Users/white1/Dev/recommenders/recs-spark-test/build-dependencies.txt"
-            "/Users/white1/Dev/recommenders/recs-validation/build-dependencies.txt"
+            ;"/Users/white1/Dev/recommenders/recs-validation/build-dependencies.txt"
             ]
  }
