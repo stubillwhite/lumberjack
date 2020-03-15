@@ -11,7 +11,8 @@
 
 (def page-state (reagent/atom {:display-non-clashing true
                                :display-clashing     true
-                               :display-project-only false}))
+                               :display-project-only false
+                               :excluded-projects    #{}}))
 
 (defn update-page-state! [f & args]
   (apply swap! page-state f args)
@@ -21,6 +22,8 @@
 (defn decode-response [body]
   (->> (.parse js/JSON body)
        (utils/to-clj)))
+
+;; Loading project data
 
 (declare load-extracted-data!)
 
@@ -80,6 +83,8 @@
          200 (update-state! #(assoc-in % [:selected-graph] (into [] (convert-nodes (decode-response body)))))
          (ant/message-error "Unable to load graph for project."))))))
 
+;; View
+
 (defn- refresh-button []
   [ant/form-item {}
    [ant/button {:type "primary" :on-click load-project-data!} "Load project data"]])
@@ -89,9 +94,14 @@
   (get-dependencies-for-project! name)
   (get-graph-for-project! name))
 
+(defn project-excluded-status [key row idx]
+  (let [id (:id (js->clj row :keywordize-keys true))]
+    (reagent.core/as-element [ant/checkbox])))
+
 (defn project-table [data]
   [ant/table 
-   {:columns    [{:title "Name" :dataIndex :name :key :name}]
+   {:columns    [{:title ""     :dataIndex :name :key :name :render project-excluded-status}
+                 {:title "Name" :dataIndex :name :key :name}]
     :dataSource data
     :pagination false
     :row-key    :name
@@ -129,20 +139,18 @@
 (defn- set-state-flag [ks value]
   (update-page-state! #(assoc-in % ks value)))
 
+(defn- switch-control [label flag]
+  [ant/row
+   [ant/col {:span 1} [ant/switch {:default-checked (flag @page-state) :on-click (partial set-state-flag [flag])}]]
+   [ant/col {:span 4} [:p label]]])
+
 (defn- page-controls []
   [:div
    (refresh-button)
    [:div
-    [ant/row
-     [ant/col {:span 1} [ant/switch {:default-checked (:display-clashing @page-state) :on-click (partial set-state-flag [:display-clashing])}]]
-     [ant/col {:span 4} [:p "Display clashing"]]]
-    [ant/row
-     [ant/col {:span 1} [ant/switch {:default-checked (:display-non-clashing @page-state) :on-click (partial set-state-flag [:display-non-clashing])}]]
-     [ant/col {:span 4} [:p "Display non-clashing"]]]
-    [ant/row
-     [ant/col {:span 1} [ant/switch {:default-checked (:display-project-only @page-state) :on-click (partial set-state-flag [:display-project-only])}]]
-     [ant/col {:span 4} [:p "Selected project-only"]]]
-    ]])
+    (switch-control "Display clashing"      :display-clashing)
+    (switch-control "Display non-clashing"  :display-non-clashing)
+    (switch-control "Selected project-only" :display-project-only)]])
 
 (defn- conditional-filter [active? f coll]
   (if active? (filter f coll) coll))
